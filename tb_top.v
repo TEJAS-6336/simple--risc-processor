@@ -1,44 +1,30 @@
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
 
-module cpu_tb;
-
+module cpu_top_tb;
     reg clk;
     reg reset;
 
-    // Instantiate the CPU
     cpu_top uut (
         .clk(clk),
         .reset(reset)
     );
 
-    // Clock generation: 10ns period
+    // clock gen
+    always #5 clk = ~clk;
+
     initial begin
         clk = 0;
-        forever #5 clk = ~clk;
-    end
-
-    // Test sequence
-    initial begin
-        $display("Starting CPU Simulation...");
         reset = 1;
-        #10;
-        reset = 0;
+        #10 reset = 0;    // release reset
 
-        // Run for 100 clock cycles
-        #1000;
-        $finish;
+        #200 $finish;
     end
 
-    // Monitor PC and some debug info (optional)
-   initial begin
-    $monitor("Time=%0t | PC=%d | R1=%d | R2=%d | R3=%d",
-             $time,
-             uut.pc_val,
-             uut.reg_file.regs[1],
-             uut.reg_file.regs[2],
-             uut.reg_file.regs[3]);
-end
-
-
+    initial begin
+        $monitor("T=%0t | PC=%d | Instr=%h | ALU result=%h | R1=%h | R2=%h",
+                  $time, uut.pc_val, uut.dbg_instr, uut.dbg_result,
+                  uut.dbg_read1, uut.dbg_read2);
+    end
 endmodule
+
 
