@@ -1,26 +1,21 @@
-`timescale 1ns / 1ps
-
 module instr_mem (
-    input  [7:0] addr,        // Address from PC
-    output reg [15:0] instr   // Instruction output
+    input  [7:0] addr,       // PC address
+    output reg [15:0] instr
 );
 
-always @(*) begin
-    case(addr)
-        // Program:
-        // R1 = 5
-        // R2 = 10
-        // R3 = R1 + R2
-        // MEM[0] = R3
+    reg [15:0] memory [0:255];
 
-        8'd0: instr = 16'b0100_0001_0000_0101; // LOAD R1, #5
-        8'd1: instr = 16'b0100_0010_0000_1010; // LOAD R2, #10
-        8'd2: instr = 16'b0000_0011_0001_0010; // ADD  R3, R1, R2
-        8'd3: instr = 16'b0101_0011_0000_0000; // STORE R3 -> MEM[0]
+    initial begin
+        // --- Simple program ---
+        memory[0] = 16'b0001_0001_0010_0011; // ADD R1, R2 -> R3
+        memory[1] = 16'b0010_0011_0001_0100; // SUB R3, R1 -> R4
+        memory[2] = 16'b1111_0000_0000_0000; // HALT
+    end
 
-        default: instr = 16'b0000_0000_0000_0000; // NOP
-    endcase
-end
+    always @(*) begin
+        instr = memory[addr];
+    end
 
 endmodule
+
 
