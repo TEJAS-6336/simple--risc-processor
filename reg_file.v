@@ -1,7 +1,4 @@
-`timescale 1ns / 1ps
-
-
-module reg_file (
+module reg_file(
     input clk,
     input reg_write,
     input [2:0] rs1, rs2, rd,
@@ -9,16 +6,25 @@ module reg_file (
     output [15:0] read_data1,
     output [15:0] read_data2
 );
-    // 8 general-purpose 16-bit registers: R0 to R7
-    reg [15:0] registers [0:7];
+    reg [15:0] regs [0:7]; // 8 registers R0-R7
 
-    // Read operations (combinational)
-    assign read_data1 = registers[rs1];
-    assign read_data2 = registers[rs2];
-
-    // Write operation (sequential)
-    always @(posedge clk) begin
-        if (reg_write && rd != 3'b000)  // optional: prevent writing to R0
-            registers[rd] <= write_data;
+    // Initialize registers with sample values
+    initial begin
+        regs[0] = 16'h0000;
+        regs[1] = 16'h0005; // R1 = 5
+        regs[2] = 16'h0003; // R2 = 3
+        regs[3] = 16'h0000;
+        regs[4] = 16'h0000;
+        regs[5] = 16'h0000;
+        regs[6] = 16'h0000;
+        regs[7] = 16'h0000;
     end
+
+    always @(posedge clk) begin
+        if (reg_write) regs[rd] <= write_data;
+    end
+
+    assign read_data1 = regs[rs1];
+    assign read_data2 = regs[rs2];
+
 endmodule
